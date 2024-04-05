@@ -3,9 +3,7 @@ package com.trithuc.service.impl;
 import com.trithuc.config.JWTTokenUtil;
 import com.trithuc.dto.*;
 import com.trithuc.model.*;
-import com.trithuc.repository.DestinationRepository;
-import com.trithuc.repository.PostRepository;
-import com.trithuc.repository.TourRepository;
+import com.trithuc.request.InfoUserRequest;
 import com.trithuc.response.AuthenticationResponse;
 import com.trithuc.response.EntityResponse;
 import com.trithuc.repository.UserRepository;
@@ -23,21 +21,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private JWTTokenUtil jwtTokenUtil;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     public BCryptPasswordEncoder passwordEncoder;
-
-    @Autowired
-    private TourRepository tourRepository;
-
-    @Autowired
-    private DestinationRepository destinationRepository;
-
-    @Autowired
-    private PostRepository postRepository;
 
 
     @Override
@@ -141,6 +128,28 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.badRequest().body("Invalid role value");
         }
     }
+
+    @Override
+    public String updateInfoUser(String token, InfoUserRequest infoUserRequest){
+        String username = Authentication(token);
+        if (username != null){
+            User user = userRepository.findByUsername(username);
+            if (user != null){
+                user.setAddress(infoUserRequest.getAddress());
+                user.setEmail(infoUserRequest.getEmail());
+                user.setFirstname(infoUserRequest.getFirstName());
+                user.setLastname(infoUserRequest.getLastName());
+                userRepository.save(user);
+                return "Save info User successfully";
+            }else {
+                return "User not found";
+            }
+        }else {
+            return "Missing username user";
+        }
+
+    }
+
 
     @Override
     public String Authentication(String token) {

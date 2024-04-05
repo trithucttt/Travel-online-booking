@@ -3,9 +3,11 @@ package com.trithuc.controller;
 import com.trithuc.dto.DestinationDto;
 import com.trithuc.dto.PostDto;
 import com.trithuc.dto.TourDto;
-import com.trithuc.model.Post;
+import com.trithuc.model.*;
+import com.trithuc.response.PaginationResponse;
 import com.trithuc.service.FileStoreService;
 import com.trithuc.service.TravelContentService;
+import com.trithuc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -16,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RequestMapping("/api")
 public class TravelContentController {
 
@@ -26,17 +28,21 @@ public class TravelContentController {
     @Autowired
     private FileStoreService fileStoreService;
 
+    @Autowired
+    UserService userService;
+
 
     @GetMapping("/post/list")
     public List<PostDto> getListPost(){
         return travelContentService.getAllPost();
     }
 
-//    @GetMapping("post/detail/{postId}")
-//    public Post detailPost(@PathVariable Long postId){
-//        System.out.println(postId);
-//        return travelContentService.getPostById(postId);
-//    }
+    @GetMapping("post/search")
+    public ResponseEntity<PaginationResponse> searchAndPaginationPost(@RequestParam(value = "title", required = false, defaultValue = "") String title,
+                                                                      @RequestParam(value = "size", required = false, defaultValue = "3") int size,
+                                                                      @RequestParam(value = "currentPage", required = false, defaultValue = "1") int currentPage) {
+        return travelContentService.searchAndPaginationPost(title, size, currentPage);
+    }
 
     @GetMapping("post/detail/{postId}")
     public PostDto detailPost(@PathVariable Long postId){
@@ -124,6 +130,34 @@ public class TravelContentController {
     public ResponseEntity<List<String>> getAllImageNames(@RequestParam(required = false, defaultValue = "destinations") String type) {
         List<String> fileNames = fileStoreService.getAllImageNames(type);
         return ResponseEntity.ok().body(fileNames);
+    }
+    @GetMapping("/business/tours")
+    public List<Tour> getToursByToken(@RequestHeader(name = "Authorization" )String token){
+        String username = userService.Authentication(token);
+        return travelContentService.listTourByToken(username);
+    }
+    @GetMapping("/business/destination")
+    public List<Destination> getDestinationByToken(@RequestHeader(name = "Authorization" )String token){
+        String username = userService.Authentication(token);
+        return travelContentService.listDestinationByToken(username);
+    }
+    @GetMapping("/business/table/destination")
+    public List<DestinationDto> getTableDestination(@RequestHeader(name = "Authorization" )String token){
+        String username = userService.Authentication(token);
+        return travelContentService.getTableDestination(username);
+    }
+
+    @GetMapping("/business/city")
+    public List<City> getAllCity(){
+        return travelContentService.getAllCity();
+    }
+    @GetMapping("/business/district")
+    public ResponseEntity<?> findDistrictsByCityId(@RequestParam Long id){
+        return travelContentService.findDistrictsByCityId(id);
+    }
+    @GetMapping("/business/ward")
+    public ResponseEntity<?> findWardByDistrictId(@RequestParam Long id){
+        return travelContentService.findWardsByDistrictId(id);
     }
 
 }

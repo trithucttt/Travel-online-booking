@@ -2,6 +2,7 @@ package com.trithuc.controller;
 
 import com.trithuc.config.JWTTokenUtil;
 import com.trithuc.model.User;
+import com.trithuc.request.InfoUserRequest;
 import com.trithuc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/auth")
 public class UserController {
     @Autowired
@@ -47,6 +48,9 @@ public class UserController {
         return userService.GetProfile(null,userId);
     }
 
-
+    @PostMapping("/profile/update")
+    public String updateInfoUser(@RequestHeader(name="Authorization") String token, @RequestBody InfoUserRequest infoUserRequest){
+        return userService.updateInfoUser(token,infoUserRequest);
+    }
 
 }

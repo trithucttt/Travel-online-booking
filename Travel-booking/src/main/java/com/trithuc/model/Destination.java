@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -20,31 +21,36 @@ import lombok.Data;
 @Entity
 @Data
 @Table(name = "destination")
-public class Destination implements Serializable{
+public class Destination implements Serializable {
 // điểm đến của các tour
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 
-	private Long id;
-	private String name;
-	// địa chỉ cụ thể của điểm đến
-	private String address;
-	
-//	 quận chứa địa chỉ của điểm đến
-	@ManyToOne
-	@JoinColumn(name = "ward_id")
-	private Ward ward;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
 
-	@ManyToOne
-	@JoinColumn(name = "manager_id")
-	private User manager;
+    private Long id;
+    private String name;
 
-	
-	// 1 tour có nhiều điểm đến và 1 điểm đến có thể thuộc nhiều tour
-	@ManyToMany(mappedBy = "destination")
-	private Set<Tour> tours = new HashSet<>();
+    @JsonIgnore
+    private String address;
 
-//	@ManyToMany
-	private String image_destination;
+
+    @ManyToOne
+    @JoinColumn(name = "ward_id")
+    @JsonIgnore
+    private Ward ward;
+
+    @ManyToOne
+    @JoinColumn(name = "manager_id")
+    @JsonIgnore
+    private User manager;
+
+
+
+    @ManyToMany(mappedBy = "destination")
+    @JsonIgnore
+    private Set<Tour> tours = new HashSet<>();
+
+    //	@ManyToMany
+    @JsonIgnore
+    private String image_destination;
 }

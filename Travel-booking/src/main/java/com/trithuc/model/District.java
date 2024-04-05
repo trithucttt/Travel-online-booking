@@ -3,6 +3,7 @@ package com.trithuc.model;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -29,19 +30,23 @@ public class District implements Serializable{
 	private String full_name_en;
 
 	@Column(name = "code_name", nullable = false)
+	@JsonIgnore
 	private String code_name;
 
 	// Các quan hệ với các entity khác
 
 	@ManyToOne
 	@JoinColumn(name = "city_id")
+	@JsonIgnore
 	private City city;
 
 	@OneToMany(mappedBy = "district")
+	@JsonIgnore
 	private List<Ward> wards;
 
 	@ManyToOne
 	@JoinColumn(name = "administrative_units_id")
+	@JsonIgnore
 	private Administrative_units administrative_units;
 
 

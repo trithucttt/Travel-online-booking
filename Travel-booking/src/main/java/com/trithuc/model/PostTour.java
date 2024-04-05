@@ -1,5 +1,6 @@
 package com.trithuc.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,8 +38,14 @@ public class PostTour implements Serializable {
     @OneToMany(mappedBy = "postTour", cascade = CascadeType.ALL)
     private List<tourbooking_item> tourbooking_items;
 
+
     private Integer quantity;
     private Double discount;
     private  LocalDateTime startTimeTour;
     private LocalDateTime endTimeTour;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "postTour", orphanRemoval = true)
+    @JsonIgnore
+    private List<CartItems> cartItems = new ArrayList<>();
+
 }

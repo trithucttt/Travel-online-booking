@@ -3,10 +3,10 @@ package com.trithuc.service;
 import com.trithuc.dto.DestinationDto;
 import com.trithuc.dto.PostDto;
 import com.trithuc.dto.TourDto;
-import com.trithuc.model.Destination;
-import com.trithuc.model.Post;
-import com.trithuc.model.Tour;
+import com.trithuc.model.*;
+import com.trithuc.response.PaginationResponse;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -14,6 +14,9 @@ import java.util.List;
 
 public interface TravelContentService {
     List<PostDto> getAllPost();
+
+    ResponseEntity<PaginationResponse> searchAndPaginationPost(String title, int size, int currentPage);
+
     PostDto getDetailPost(Long postId);
 
     Post getPostById(Long postId);
@@ -47,4 +50,17 @@ public interface TravelContentService {
     List<PostDto> sortByTitle();
 
     List<PostDto> getPostByUser(Long useId);
+
+    List<Tour> listTourByToken(String username);
+
+    List<Destination> listDestinationByToken(String username);
+
+    List<DestinationDto> getTableDestination(String username);
+
+    List<City> getAllCity();
+
+
+    ResponseEntity<?> findDistrictsByCityId(Long id);
+
+    ResponseEntity<?> findWardsByDistrictId(Long id);
 }

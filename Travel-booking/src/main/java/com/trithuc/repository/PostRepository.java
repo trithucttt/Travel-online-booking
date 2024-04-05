@@ -2,6 +2,8 @@ package com.trithuc.repository;
 
 import com.trithuc.model.Post;
 import com.trithuc.model.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,12 +19,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query("SELECT t FROM Post t WHERE t.users.id = :user")
     List<Post> findPostsByUserId(@Param("user") Long user);
 
-    // search by only title post
-    List<Post> findByTitleContainingIgnoreCase(String title);
-
-//    @Query(value = "SELECT p FROM Post p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :title, '%'))")
-//    List<Post> searchByTitlePost(String title);
-
     // Search by article title and search for articles with similar tour titles
     @Query("SELECT DISTINCT p FROM Post p " +
             "LEFT JOIN p.tours t " +
@@ -30,6 +26,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "OR LOWER(t.tour.title) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
     List<Post> findByTitleContainingOrTourTitleContaining(String searchTerm);
 
+    Page<Post> findByTitleLikeIgnoreCaseAndIsDeleteFalse(Pageable pageable,String title);
     List<Post> findAllByOrderByTitleAsc();
 
     List<Post> findPostByStartTimeGreaterThanEqual(LocalDateTime startTime);

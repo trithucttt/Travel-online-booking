@@ -33,27 +33,22 @@ public class tourbooking_item implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private String tour_name;
-	private String day_tour;
-	private String check_in_date;
 	private Long quantity;
-	private Double price;
-	private String location;
-	private String supplier;
-	private String  imageCart;
+
 	@ManyToOne
 	@JoinColumn(name =  "post_tour_id")
 	private PostTour postTour;
 
+	private Long price;
 	@ManyToOne
 	@JoinColumn(name = "yourbooking_id")
 	private YourBooking yourbooking;
 	
-	@Enumerated(EnumType.STRING)
-    private itemStatus status;
-	public enum itemStatus {
-	    INCART,
-	    CHECKED_OUT,
-	}
+//	@Enumerated(EnumType.STRING)
+//    private itemStatus status;
+//	public enum itemStatus {
+//	    INCART,
+//	    CHECKED_OUT,
+//	}
 	
 }

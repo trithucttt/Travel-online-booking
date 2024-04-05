@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -25,13 +26,22 @@ public class Tour implements Serializable {
 
     private Long id;
     private String title;
+
     @Lob
-    @Column(length = 1000)
+    @Column(length = 100000)
+    @JsonIgnore
     private String description;
+
+    @JsonIgnore
     private Double price;
+
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "manager_id")
     private User manager;
+
+    @JsonIgnore
+    private Boolean isDelete;
 
     @ManyToMany
     @JoinTable(
@@ -39,11 +49,14 @@ public class Tour implements Serializable {
             joinColumns = @JoinColumn(name = "tour_id"),
             inverseJoinColumns = @JoinColumn(name = "destination_id")
     )
+    @JsonIgnore
     private Set<Destination> destination = new HashSet<>();
 
 
     @OneToMany(mappedBy = "tour")
+    @JsonIgnore
     private Set<PostTour> posts = new HashSet<>();
+    @JsonIgnore
     private String image_tour;
 
 

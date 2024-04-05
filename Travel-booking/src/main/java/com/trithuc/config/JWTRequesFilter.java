@@ -20,8 +20,6 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JWTRequesFilter extends OncePerRequestFilter{
 
-//	@Autowired
-//	private UserDetailsService userDetailsService;
 	
 	@Autowired
 	private JWTTokenUtil jwtTokenUtil;

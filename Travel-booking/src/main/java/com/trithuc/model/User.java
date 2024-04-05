@@ -1,27 +1,19 @@
 package com.trithuc.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.bytecode.internal.bytebuddy.PrivateAccessorException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
 @Data
@@ -58,7 +50,9 @@ public class User implements Serializable {
 	private Set<Destination> managedDestination;
 
 	@OneToMany(mappedBy = "user")
-	private Set<Comment> comments; // Các comment của người dùng
-	
-	
+	private List<Comment> comments = new ArrayList<>(); // Các comment của người dùng
+
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+	@JsonIgnore
+	private List<CartItems> cartItems = new ArrayList<>();
 }

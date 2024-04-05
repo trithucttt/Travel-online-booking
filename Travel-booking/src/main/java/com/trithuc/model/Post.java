@@ -43,6 +43,8 @@ public class Post implements Serializable{
 	@Column
 	private LocalDateTime endTime;
 
+	private Boolean isDelete;
+
 	@OneToMany(mappedBy = "post")
 	private Set<PostTour> tours = new HashSet<>();
 

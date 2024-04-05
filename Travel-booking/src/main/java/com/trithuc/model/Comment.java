@@ -25,6 +25,7 @@ public class Comment implements Serializable {
     private String content;
     private LocalDateTime start_time;
 
+    private Short rating;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

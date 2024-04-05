@@ -38,29 +38,17 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
     @Autowired
     private JWTRequesFilter jwtrequesFilter;
-    private PasswordEncoder passwordEncoder;
-
-    private UserDetailsService userDetailsService;
-
-
-    @Autowired
-    private DataSource dataSource;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 // .exceptionHandling().authenticationEntryPoint(userAuthenticationEntryPoint)
                 // .and()
-//				 .addFilterBefore(new
-//				 JwtAuthFitlter(userAuthenticationProvider),BasicAuthenticationFilter.class)
                 .csrf(csrf -> csrf.disable())
                 //	.headers().frameOptions().disable()
                 //	.and()
-				.sessionManagement(httpSecutityManagementConfiggure -> {
-					httpSecutityManagementConfiggure
+				.sessionManagement(httpSecurityManagementConfigure -> {
+                    httpSecurityManagementConfigure
 						.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 				})
                 .authorizeHttpRequests(authorize -> authorize
