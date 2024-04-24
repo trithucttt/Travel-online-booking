@@ -4,9 +4,13 @@ import com.trithuc.dto.DestinationDto;
 import com.trithuc.dto.PostDto;
 import com.trithuc.dto.TourDto;
 import com.trithuc.model.*;
+import com.trithuc.request.AddPostRequest;
+import com.trithuc.request.DestinationRequest;
+import com.trithuc.response.MessageResponse;
 import com.trithuc.response.PaginationResponse;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -63,4 +67,10 @@ public interface TravelContentService {
     ResponseEntity<?> findDistrictsByCityId(Long id);
 
     ResponseEntity<?> findWardsByDistrictId(Long id);
+
+    String createDestination(String name, String address, Long wardId,String description, MultipartFile image, String username);
+
+    ResponseEntity<MessageResponse> createNewTour(String titleTour, Double price, String description, List<Long> destinationId, MultipartFile image, String username);
+
+    ResponseEntity<MessageResponse> createNewPost(AddPostRequest addPostRequest, String username);
 }

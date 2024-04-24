@@ -22,4 +22,6 @@ public interface DestinationRepository extends JpaRepository<Destination,Long> {
 
     @Query("SELECT t.image_destination FROM Destination t WHERE t.id = :desId")
     String findImageNameByDestinationId(Long desId);
+    @Query(value = "SELECT MAX(id) FROM Destination")
+    Long getMaxId();
 }

@@ -25,30 +25,34 @@ public class User implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	 private Long id;
+	@JsonIgnore
 	private String username;
 	private String firstname;
 	private String lastname;
+	@JsonIgnore
 	private String email;
+	@JsonIgnore
 	private String password;
 	private String profileImage;
+	@JsonIgnore
 	private String address;
-	
+	@JsonIgnore
 	@Enumerated(EnumType.STRING)
 	private Role role;
-	
+	@JsonIgnore
 	@OneToMany(mappedBy = "users")
 	@JsonManagedReference
 	private List<Post> posts;
-	
+	@JsonIgnore
 	@OneToMany(mappedBy = "user")
 	private List<YourBooking> yourBookings;
-
+	@JsonIgnore
 	@OneToMany(mappedBy = "manager")
 	private Set<Tour> managedTour;
-
+	@JsonIgnore
 	@OneToMany(mappedBy = "manager")
 	private Set<Destination> managedDestination;
-
+	@JsonIgnore
 	@OneToMany(mappedBy = "user")
 	private List<Comment> comments = new ArrayList<>(); // Các comment của người dùng
 

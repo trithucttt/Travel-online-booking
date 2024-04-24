@@ -45,7 +45,7 @@ public class Post implements Serializable{
 
 	private Boolean isDelete;
 
-	@OneToMany(mappedBy = "post")
+	@OneToMany(mappedBy = "post",cascade = CascadeType.ALL,orphanRemoval = true)
 	private Set<PostTour> tours = new HashSet<>();
 
 

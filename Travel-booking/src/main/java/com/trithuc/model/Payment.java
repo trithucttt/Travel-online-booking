@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -21,9 +22,9 @@ public class Payment {
     private String code;
 
     @DateTimeFormat(pattern="yyyy-MM-dd")
-    private LocalDate date;
+    private LocalDateTime date;
 
-    private Long total;
+    private Double total;
 
     @OneToOne
     @JoinColumn(name = "yourBooking_id")

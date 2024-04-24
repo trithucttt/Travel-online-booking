@@ -7,11 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentRequest {
-    private Long id;
+public class AddToCartRequest {
     private Long postId;
     private Long tourId;
-    private String username;
-    private String content;
-    private Short rating;
+    private Integer quantity;
 }

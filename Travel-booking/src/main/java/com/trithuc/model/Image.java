@@ -2,6 +2,7 @@ package com.trithuc.model;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,19 +22,20 @@ public class Image implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	 private Long id;
-	private String entityType;// loại ảnh
-	private Long entityId;//id của loại
 
-	
-	private String imageData;
+	@JsonIgnore
+	private String entityType;// loại ảnh
+
+	private String imageUrl;
  	
 //	@ManyToOne
 //	@JoinColumn(name = "tour_id")
 //	private Tour tour;
 	
-//	@ManyToOne
-//	@JoinColumn(name = "post_id")
-//	private Post post;
+	@ManyToOne
+	@JoinColumn(name = "comment_id")
+	@JsonIgnore
+	private Comment comment;
 	
 	
 }

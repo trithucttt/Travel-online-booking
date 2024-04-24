@@ -1,6 +1,7 @@
 package com.trithuc.config;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import com.trithuc.model.User;
 import com.trithuc.repository.UserRepository;
@@ -40,9 +41,9 @@ public class JWTRequesFilter extends OncePerRequestFilter{
 		String jwtToken = requesTokenHeader.split(" ")[1].trim();
 		String usernam = jwtTokenUtil.getUsernameFromToken(jwtToken);
 		//UserDetails userValObject =  userDetailsService.loadUserByUsername(usernam);
-		User user = userRepository.findByUsername(usernam);
+		Optional<User> user = Optional.ofNullable(userRepository.findByUsername(usernam).orElse(null));
 		
-		if (jwtTokenUtil.validateToken(jwtToken, user)) {
+		if (jwtTokenUtil.validateToken(jwtToken, user.get())) {
 		    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(user, null);
 		    usernamePasswordAuthenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 		    SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);

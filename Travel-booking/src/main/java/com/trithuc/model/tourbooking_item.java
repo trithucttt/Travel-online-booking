@@ -33,13 +33,13 @@ public class tourbooking_item implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	private Long quantity;
+	private Integer quantity;
 
 	@ManyToOne
 	@JoinColumn(name =  "post_tour_id")
 	private PostTour postTour;
 
-	private Long price;
+	private Double price;
 	@ManyToOne
 	@JoinColumn(name = "yourbooking_id")
 	private YourBooking yourbooking;

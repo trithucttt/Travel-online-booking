@@ -7,6 +7,7 @@ import com.trithuc.request.InfoUserRequest;
 import com.trithuc.response.AuthenticationResponse;
 import com.trithuc.response.EntityResponse;
 import com.trithuc.repository.UserRepository;
+import com.trithuc.response.MessageResponse;
 import com.trithuc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -29,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String registerUser(User user) {
-        if (userRepository.findByUsername(user.getUsername()) != null) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             return "failed";
         }
         user.setRole(Role.USER);
@@ -47,11 +49,11 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Missing username or password");
         }
 
-        User user = userRepository.findByUsername(username);
-        if (user == null || !passwordEncoder.matches(password, user.getPassword())) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty() || !passwordEncoder.matches(password, user.get().getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
-        Role role = user.getRole();
+        Role role = user.get().getRole();
         String roleName = role.name();
         String token = jwtTokenUtil.generateToken(username,roleName);
 
@@ -60,11 +62,11 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public User getUserFromTokenOrId(String token, Long userId) {
+    public Optional<User> getUserFromTokenOrId(String token, Long userId) {
         if (token != null && !token.isEmpty()) {
             return userRepository.findByUsername(Authentication(token));
         } else if (userId != null) {
-            return userRepository.findById(userId).orElse(null);
+            return Optional.ofNullable(userRepository.findById(userId).orElse(null));
         }
         return null;
     }
@@ -72,26 +74,37 @@ public class UserServiceImpl implements UserService {
     @Override
     public ResponseEntity<?> GetProfile(String token , Long userId) {
         try {
-            User user = getUserFromTokenOrId(token, userId);
-            if (user == null) {
+            Optional<User> user = getUserFromTokenOrId(token, userId);
+            if (user.isEmpty()) {
                 return ResponseEntity.badRequest().body("User not found");
             }
 //            Role role = Role.valueOf(roleStr.toUpperCase())
-            Role role = user.getRole();
-            switch (role) {
-                case USER:
-                    // Lấy dữ liệu profile cho user
+            Role role = user.get().getRole();
+            return switch (role) {
+                case USER -> {
                     ProfileDto userProfile = new ProfileDto(
-                            user.getId(),
-                            user.getUsername(),
-                            user.getFirstname(),
-                            user.getLastname(),
-                            user.getEmail(),
-                            user.getProfileImage(),
-                            user.getAddress());
-                    return ResponseEntity.ok(userProfile);
-
-                case BUSINESS:
+                            user.get().getId(),
+                            user.get().getUsername(),
+                            user.get().getFirstname(),
+                            user.get().getLastname(),
+                            user.get().getEmail(),
+                            user.get().getProfileImage(),
+                            user.get().getAddress(),
+                            user.get().getProfileImage());
+                    yield ResponseEntity.ok(userProfile);
+                    // Lấy dữ liệu profile cho user
+                }
+                case BUSINESS -> {
+                    ProfileDto businessProfile = new ProfileDto(
+                            user.get().getId(),
+                            user.get().getUsername(),
+                            user.get().getFirstname(),
+                            user.get().getLastname(),
+                            user.get().getEmail(),
+                            user.get().getProfileImage(),
+                            user.get().getAddress(),
+                            user.get().getProfileImage());
+                    yield ResponseEntity.ok(businessProfile);
                     // Lấy dữ liệu profile cho business
 //                    List<TourDto> tourDtoList = travelContentService.getTourByUser(userId);
 //                    List<DestinationDto> destinationDtoList = travelContentService.getDestinationByUser(userId);
@@ -107,23 +120,12 @@ public class UserServiceImpl implements UserService {
 //                    businessProfile.setToursDto(tourDtoList);
 //                    businessProfile.setDestinationsDto(destinationDtoList);
 //                    .setPostsDto(postDtoList);
-                    ProfileDto businessProfile = new ProfileDto(
-                            user.getId(),
-                            user.getUsername(),
-                            user.getFirstname(),
-                            user.getLastname(),
-                            user.getEmail(),
-                            user.getProfileImage(),
-                            user.getAddress());
-                    return ResponseEntity.ok(businessProfile);
-
-                case ADMIN:
+                }
+                case ADMIN ->
                     //xử lý khác biệt cho admin
-                    return ResponseEntity.ok("Admin profile data");
-
-                default:
-                    return ResponseEntity.badRequest().body("Invalid role");
-            }
+                        ResponseEntity.ok("Admin profile data");
+                default -> ResponseEntity.badRequest().body("Invalid role");
+            };
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("Invalid role value");
         }
@@ -133,13 +135,13 @@ public class UserServiceImpl implements UserService {
     public String updateInfoUser(String token, InfoUserRequest infoUserRequest){
         String username = Authentication(token);
         if (username != null){
-            User user = userRepository.findByUsername(username);
-            if (user != null){
-                user.setAddress(infoUserRequest.getAddress());
-                user.setEmail(infoUserRequest.getEmail());
-                user.setFirstname(infoUserRequest.getFirstName());
-                user.setLastname(infoUserRequest.getLastName());
-                userRepository.save(user);
+            Optional<User> user = userRepository.findByUsername(username);
+            if (user.isPresent()){
+                user.get().setAddress(infoUserRequest.getAddress());
+                user.get().setEmail(infoUserRequest.getEmail());
+                user.get().setFirstname(infoUserRequest.getFirstName());
+                user.get().setLastname(infoUserRequest.getLastName());
+                userRepository.save(user.get());
                 return "Save info User successfully";
             }else {
                 return "User not found";
@@ -150,6 +152,22 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public User getCurrentFullNameUser(String token){
+        String username = Authentication(token);
+        if (username != null){
+            Optional<User> user = userRepository.findByUsername(username);
+            return user.orElse(null);
+        }else {
+            return null;
+        }
+    }
+    @Override
+    public String getCurrentAvatarUser(String token) {
+        String username = Authentication(token);
+        Optional<User> user = userRepository.findByUsername(username);
+        return user.map(User::getProfileImage).orElse(null);
+    }
 
     @Override
     public String Authentication(String token) {
@@ -157,11 +175,42 @@ public class UserServiceImpl implements UserService {
             token = token.substring(7);
         }
         String username = jwtTokenUtil.getUsernameFromToken(token);
-        User user = userRepository.findByUsername(username);
-        if (user != null) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isPresent()) {
             return username;
         } else {
             return null;
+        }
+    }
+
+    @Override
+    public ResponseEntity<MessageResponse> changePass(Map<String, String> changePassData ,String token) {
+       MessageResponse messageResponse = new MessageResponse();
+        String oldPass = changePassData.get("oldPass");
+        String newPass = changePassData.get("newPass");
+        String username = Authentication(token);
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isEmpty()){
+            messageResponse.setResponseCode("404");
+            messageResponse.setMessage("User not Found");
+            return ResponseEntity.ok(messageResponse);
+        }else {
+            User user = userOptional.get();
+            if (!passwordEncoder.matches(oldPass,user.getPassword())){
+                messageResponse.setMessage("Old Password Incorrect");
+                messageResponse.setResponseCode("400");
+                return ResponseEntity.ok(messageResponse);
+            }
+            if (passwordEncoder.matches(oldPass,user.getPassword())){
+                messageResponse.setMessage("The new password must not be the same as the old password");
+                messageResponse.setResponseCode("300");
+                return ResponseEntity.ok(messageResponse);
+            }
+            user.setPassword(passwordEncoder.encode(newPass));
+            userRepository.save(user);
+            messageResponse.setResponseCode("200");
+            messageResponse.setMessage("Change Password Successfully");
+            return ResponseEntity.ok(messageResponse);
         }
     }
 

@@ -3,6 +3,7 @@ package com.trithuc.controller;
 import com.trithuc.config.JWTTokenUtil;
 import com.trithuc.model.User;
 import com.trithuc.request.InfoUserRequest;
+import com.trithuc.response.MessageResponse;
 import com.trithuc.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -53,4 +54,19 @@ public class UserController {
         return userService.updateInfoUser(token,infoUserRequest);
     }
 
+
+    @GetMapping("/currentFullNameUser")
+    public User getCurrentFullNameUser(@RequestHeader(name="Authorization") String token){
+        return userService.getCurrentFullNameUser(token);
+    }
+    @GetMapping("/image")
+    public String getCurrentAvatarUser(@RequestHeader(name="Authorization") String token){
+        return userService.getCurrentAvatarUser(token);
+    }
+
+    @PostMapping("changePass")
+    public ResponseEntity<MessageResponse> changePass(@RequestBody Map<String,String> changePassData,
+                                                      @RequestHeader(name = "Authorization") String token){
+        return userService.changePass(changePassData,token);
+    }
 }

@@ -28,4 +28,6 @@ public interface TourRepository extends JpaRepository<Tour,Long> {
     List<Double> findDiscountsByPostId(@Param("postId") Long postId);
 
     List<Tour> findByTitleContainingIgnoreCase(String title);
+    @Query(value = "SELECT MAX(id) FROM Tour ")
+    Long getMaxId();
 }

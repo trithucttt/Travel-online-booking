@@ -4,6 +4,10 @@ import com.trithuc.dto.DestinationDto;
 import com.trithuc.dto.PostDto;
 import com.trithuc.dto.TourDto;
 import com.trithuc.model.*;
+import com.trithuc.request.AddPostRequest;
+import com.trithuc.request.AddPostTourRequest;
+import com.trithuc.request.DestinationRequest;
+import com.trithuc.response.MessageResponse;
 import com.trithuc.response.PaginationResponse;
 import com.trithuc.service.FileStoreService;
 import com.trithuc.service.TravelContentService;
@@ -13,6 +17,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,7 +38,7 @@ public class TravelContentController {
 
 
     @GetMapping("/post/list")
-    public List<PostDto> getListPost(){
+    public List<PostDto> getListPost() {
         return travelContentService.getAllPost();
     }
 
@@ -45,24 +50,24 @@ public class TravelContentController {
     }
 
     @GetMapping("post/detail/{postId}")
-    public PostDto detailPost(@PathVariable Long postId){
+    public PostDto detailPost(@PathVariable Long postId) {
         System.out.println(postId);
         return travelContentService.getDetailPost(postId);
     }
 
     @GetMapping("post/{userId}")
-    public List<PostDto> getPostByUser(@PathVariable Long userId){
+    public List<PostDto> getPostByUser(@PathVariable Long userId) {
 //        System.out.println(useId);
         return travelContentService.getPostByUser(userId);
     }
 
     @GetMapping("/tour/{userId}")
-    public List<TourDto> getTourByUser(@PathVariable Long userId){
+    public List<TourDto> getTourByUser(@PathVariable Long userId) {
         return travelContentService.getTourByUser(userId);
     }
 
     @GetMapping("/tour")
-    public List<TourDto> getTourByTokenUser(@RequestHeader(name = "Authorization") String  token){
+    public List<TourDto> getTourByTokenUser(@RequestHeader(name = "Authorization") String token) {
         return travelContentService.getTourByTokenUser(token);
     }
 //    @GetMapping("tour/detail/{tourId}")
@@ -73,14 +78,14 @@ public class TravelContentController {
 
     @GetMapping("tour/detail/{postId}/{tourId}")
     public TourDto detailTourFollowPost(@PathVariable Long postId,
-                                        @PathVariable Long tourId){
+                                        @PathVariable Long tourId) {
         System.out.println(postId);
         System.out.println(tourId);
-        return travelContentService.DetailTourFolloPost(postId,tourId);
+        return travelContentService.DetailTourFolloPost(postId, tourId);
     }
 
     @GetMapping("/des/{userId}")
-    public List<DestinationDto> getDestinationByUser(@PathVariable Long userId){
+    public List<DestinationDto> getDestinationByUser(@PathVariable Long userId) {
         return travelContentService.getDestinationByUser(userId);
     }
 
@@ -106,58 +111,97 @@ public class TravelContentController {
     }
 
     @GetMapping("search/title")
-    public List<PostDto> searchByName(@RequestParam(required = false) String name){
-        return travelContentService.searchByName(name,null,null);
+    public List<PostDto> searchByName(@RequestParam(required = false) String name) {
+        return travelContentService.searchByName(name, null, null);
     }
+
     @GetMapping("search/timeStart")
-    public List<PostDto> searchByStartTime(@RequestParam(required = false) LocalDateTime startTime){
-        return travelContentService.searchByName(null,startTime,null);
+    public List<PostDto> searchByStartTime(@RequestParam(required = false) LocalDateTime startTime) {
+        return travelContentService.searchByName(null, startTime, null);
     }
+
     @GetMapping("search/timeEnd")
-    public List<PostDto> searchByEndTime(@RequestParam(required = false) LocalDateTime endTime){
-        return travelContentService.searchByName(null,null,endTime);
+    public List<PostDto> searchByEndTime(@RequestParam(required = false) LocalDateTime endTime) {
+        return travelContentService.searchByName(null, null, endTime);
     }
+
     @GetMapping("sort/title")
-    public List<PostDto> sortByTitle(){
+    public List<PostDto> sortByTitle() {
         return travelContentService.sortByTitle();
     }
+
     @GetMapping("sort/price")
-    public List<PostDto> sortByPrice(){
+    public List<PostDto> sortByPrice() {
         return travelContentService.sortByPrice();
     }
 
     @GetMapping("/images")
-    public ResponseEntity<List<String>> getAllImageNames(@RequestParam(required = false, defaultValue = "destinations") String type) {
+    public ResponseEntity<List<String>> getAllImageDestination(@RequestParam(required = false, defaultValue = "destinations") String type) {
         List<String> fileNames = fileStoreService.getAllImageNames(type);
         return ResponseEntity.ok().body(fileNames);
     }
+
+
     @GetMapping("/business/tours")
-    public List<Tour> getToursByToken(@RequestHeader(name = "Authorization" )String token){
+    public List<Tour> getToursByToken(@RequestHeader(name = "Authorization") String token) {
         String username = userService.Authentication(token);
         return travelContentService.listTourByToken(username);
     }
+
     @GetMapping("/business/destination")
-    public List<Destination> getDestinationByToken(@RequestHeader(name = "Authorization" )String token){
+    public List<Destination> getDestinationByToken(@RequestHeader(name = "Authorization") String token) {
         String username = userService.Authentication(token);
         return travelContentService.listDestinationByToken(username);
     }
+
     @GetMapping("/business/table/destination")
-    public List<DestinationDto> getTableDestination(@RequestHeader(name = "Authorization" )String token){
+    public List<DestinationDto> getTableDestination(@RequestHeader(name = "Authorization") String token) {
         String username = userService.Authentication(token);
         return travelContentService.getTableDestination(username);
     }
 
     @GetMapping("/business/city")
-    public List<City> getAllCity(){
+    public List<City> getAllCity() {
         return travelContentService.getAllCity();
     }
+
     @GetMapping("/business/district")
-    public ResponseEntity<?> findDistrictsByCityId(@RequestParam Long id){
+    public ResponseEntity<?> findDistrictsByCityId(@RequestParam Long id) {
         return travelContentService.findDistrictsByCityId(id);
     }
+
     @GetMapping("/business/ward")
-    public ResponseEntity<?> findWardByDistrictId(@RequestParam Long id){
+    public ResponseEntity<?> findWardByDistrictId(@RequestParam Long id) {
         return travelContentService.findWardsByDistrictId(id);
+    }
+
+    @PostMapping("business/destination/save")
+    public String createDestination(@RequestParam("destinationName") String destinationName,
+                                    @RequestParam("address") String address,
+                                    @RequestParam("wardId") Long wardId,
+                                    @RequestParam("description")String description,
+                                    @RequestParam("image") MultipartFile image,
+                                    @RequestHeader(name = "Authorization")
+                                    String token) {
+        String username = userService.Authentication(token);
+        return travelContentService.createDestination(destinationName,address,wardId,description,image,username);
+    }
+
+    @PostMapping("business/tour/save")
+    public ResponseEntity<MessageResponse> createTour(@RequestParam("titleTour") String titleTour,
+                                                      @RequestParam("price") Double price,
+                                                      @RequestParam("destinationId") List<Long> destinationId,
+                                                      @RequestParam("description")String description,
+                                                      @RequestParam("image") MultipartFile image,
+                                                      @RequestHeader(name = "Authorization")
+                                    String token) {
+        String username = userService.Authentication(token);
+        return travelContentService.createNewTour(titleTour,price,description,destinationId,image,username);
+    }
+
+    @PostMapping("business/post/save")
+    public ResponseEntity<MessageResponse> createNewPost(@RequestHeader(name = "Authorization")String token, @RequestBody AddPostRequest addPostRequest){
+        return travelContentService.createNewPost(addPostRequest,userService.Authentication(token));
     }
 
 }

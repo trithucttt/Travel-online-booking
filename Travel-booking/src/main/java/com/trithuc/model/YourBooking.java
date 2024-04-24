@@ -25,13 +25,9 @@ public class YourBooking implements Serializable{
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
-	
-	@Enumerated(EnumType.STRING)
-    private bookingStatus status;
-	public enum bookingStatus {
-	    SPENDING,
-	    SHIPPING,
-	}
+
+    private String status;
+
 	
 	@OneToMany(mappedBy = "yourbooking", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	private List<tourbooking_item> tourbooking_items;

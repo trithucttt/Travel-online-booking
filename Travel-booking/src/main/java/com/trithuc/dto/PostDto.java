@@ -26,5 +26,6 @@ public class PostDto implements Serializable {
     private List<String> imagePost;
     private Double rateAvg;
     private Double avgDiscount;
+    private String avatarUser;
 //    private Boolean isDelete;
 }

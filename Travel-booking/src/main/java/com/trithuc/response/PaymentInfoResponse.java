@@ -16,4 +16,5 @@ public class PaymentInfoResponse {
     private LocalDateTime payDay;
     private String message;
     private String resCode;
+    private Double totalPrice;
 }
